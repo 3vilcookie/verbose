@@ -11,10 +11,20 @@ class Vocabulary
 
     public function __construct()
     {
-        require_once "Config.php";
+        require "Config.php";
         $this->password = $CONFIG['db_password'];
         $this->user = $CONFIG['db_user'];
         $this->db = new PDO('mysql:host=localhost;dbname=langpp;charset=utf8', $this->user, $this->password);
+    }
+
+    public function getWordCount()
+    {
+        $statement = $this->db->prepare("SELECT COUNT(*) as count FROM vocabulary");
+
+        if($statement->execute())
+            return $statement->fetch()['count'];
+        else
+            return 0;
     }
 
     public function getSortedWordList($column, $cending = true)
@@ -36,7 +46,7 @@ class Vocabulary
 
     public function getWordList()
     {
-        $statement = $this->db->prepare("SELECT * FROM vocabulary");
+        $statement = $this->db->prepare("SELECT * FROM vocabulary ORDER BY en");
 
         $list = array();
 
@@ -58,6 +68,23 @@ class Vocabulary
         {
             var_dump( $statement->errorInfo() );
         }
+    }
+
+    public function getRandomWord()
+    {   
+        $statement = $this->db->prepare("SELECT * FROM vocabulary ORDER BY RAND() LIMIT 1");
+
+        if($statement->execute())
+        {
+            $row = $statement->fetch();
+            return array('en' => $row['en'], 'de' => $row['de']);
+        }
+        else
+        {
+            return array('en' => 'DATABASE', 'de' => 'FUCKUP');
+        }
+
+
     }
 
 }
