@@ -1,10 +1,17 @@
 <?php
-require_once 'Vocabulary.php';
+    /*
+     * @file:    index.php
+     * @brief:   Mainpage of the Vocabulary-App 
+     * @author:  Raphael Pour <info@raphaelpour.de>
+     * @date:    01-2019
+     */
+        
+    require_once 'Vocabulary.php';
 
-$voc = new Vocabulary();
+    $voc = new Vocabulary();
 
-$randomTranslation = $voc->getRandomWord();
-$randomWord = $randomTranslation['en'] . " - " . $randomTranslation['de'];
+    $randomTranslation = $voc->getRandomWord();
+    $randomWord = $randomTranslation['en'] . " - " . $randomTranslation['de'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +27,7 @@ $randomWord = $randomTranslation['en'] . " - " . $randomTranslation['de'];
     <div class="col-lg-2"><a href='.'><img src='logo.png'></a></div>
     <div class="col-lg-4">
         <h1><em>verbose</em></h1>
-        <p>wortreich, langatmig, ausfÃ¼hrlich, weitschweifig</p>
+        <p>wortreich, langatmig, ausführlich, weitschweifig</p>
     </div>
 </div>
 </div>
@@ -69,7 +76,7 @@ foreach($words as $word)
 <footer>
 <div class='container' style='text-align:center'>
 <hr>
-(C) 2018 <a href='https://raphaelpour.de'>Raphael Pour</a>| <a href='https://www.gnu.org/licenses/lgpl-3.0.en.html'>LGPL</a> | <a href='https://raphaelpour.de/impressum/'>Impressum</a>
+(C) 2019 <a href='https://raphaelpour.de'>Raphael Pour</a>| <a href='https://www.gnu.org/licenses/gpl-3.0.en.html'>GPL v3</a> | <a href='https://raphaelpour.de/impressum/'>Impressum</a>
 </div>
 </footer>
 
