@@ -1,3 +1,9 @@
+/*
+ * @file:    db_structure.sql
+ * @brief:   Creates db structure for the Vocabulary-App
+ * @author:  Raphael Pour <info@raphaelpour.de>
+ * @date:    01-2019
+ */
 DROP TABLE IF EXISTS `vocabulary`;
 CREATE TABLE `vocabulary` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
