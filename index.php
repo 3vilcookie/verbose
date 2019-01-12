@@ -12,6 +12,8 @@
 
     $randomTranslation = $voc->getRandomWord();
     $randomWord = $randomTranslation['en'] . " - " . $randomTranslation['de'];
+
+header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +29,7 @@
     <div class="col-lg-2"><a href='.'><img src='logo.png'></a></div>
     <div class="col-lg-4">
         <h1><em>verbose</em></h1>
-        <p>wortreich, langatmig, ausführlich, weitschweifig</p>
+        <p>wortreich, langatmig, ausfÃ¼hrlich, weitschweifig</p>
     </div>
 </div>
 </div>
