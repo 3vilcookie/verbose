@@ -1,5 +1,10 @@
 <?php
-
+    /*
+     * @file:    Vocabulary.php
+     * @brief:   Vocabulary-API with db access
+     * @author:  Raphael Pour <info@raphaelpour.de>
+     * @date:    01-2019
+     */
 
 class Vocabulary
 {
@@ -65,9 +70,7 @@ class Vocabulary
         $statement->bindParam(':en', $en,PDO::PARAM_STR);
 
         if($statement->execute() !== True)
-        {
             var_dump( $statement->errorInfo() );
-        }
     }
 
     public function getRandomWord()
@@ -80,12 +83,8 @@ class Vocabulary
             return array('en' => $row['en'], 'de' => $row['de']);
         }
         else
-        {
-            return array('en' => 'DATABASE', 'de' => 'FUCKUP');
-        }
-
-
+            return array('en' => 'DATABASE', 'de' => 'Something went terribly wrong.');
+        
     }
-
 }
 ?>
