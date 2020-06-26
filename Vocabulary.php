@@ -3,8 +3,11 @@
      * @file:    Vocabulary.php
      * @brief:   Vocabulary-API with db access
      * @author:  Raphael Pour <info@raphaelpour.de>
-     * @date:    01-2019
+     * @date:    01-2019 - 07-2020
      */
+
+ini_set("log_errors", 1);
+ini_set("error_log","/var/log/verbose_error.log");
 
 class Vocabulary
 {
@@ -27,9 +30,10 @@ class Vocabulary
         $statement = $this->db->prepare("SELECT COUNT(*) as count FROM vocabulary");
 
         if($statement->execute())
-            return $statement->fetch()['count'];
-        else
-            return 0;
+          return $statement->fetch()['count'];
+
+        error_log("Error getting the word count: " . $statement->errorInfo());        
+        return 0;
     }
 
     public function getSortedWordList($column, $cending = true)
@@ -46,6 +50,7 @@ class Vocabulary
             while($row = $statement->fetch())
                 array_push($list, array('en' => $row['en'], 'de' => $row['de']));
 
+        error_log("Error getting sorted word list: " . $statement->errorInfo());        
         return $list;
     }
 
@@ -59,6 +64,7 @@ class Vocabulary
             while($row = $statement->fetch())
                 array_push($list, array('en' => $row['en'], 'de' => $row['de']));
 
+        error_log("Error getting word list: " . $statement->errorInfo());        
         return $list;
     }
 
@@ -70,7 +76,7 @@ class Vocabulary
         $statement->bindParam(':en', $en,PDO::PARAM_STR);
 
         if($statement->execute() !== True)
-            var_dump( $statement->errorInfo() );
+            error_log("Error adding a word " . $statement->errorInfo());        
     }
 
     public function getRandomWord()
@@ -82,9 +88,9 @@ class Vocabulary
             $row = $statement->fetch();
             return array('en' => $row['en'], 'de' => $row['de']);
         }
-        else
-            return array('en' => 'DATABASE', 'de' => 'Something went terribly wrong.');
         
+        error_log("Error getting a random word " . $statement->errorInfo());        
+        return array();
     }
 }
 ?>
