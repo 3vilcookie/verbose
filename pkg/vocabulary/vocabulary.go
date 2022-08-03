@@ -21,7 +21,7 @@ func New() *Vocabulary {
 	return v
 }
 
-func FromFile(filename string) (*Vocabulary, error) {
+func LoadFile(filename string) (*Vocabulary, error) {
 	v := New()
 	v.Filename = filename
 	if err := v.Load(); err != nil {
@@ -53,7 +53,7 @@ func (v *Vocabulary) Save() error {
 	return os.WriteFile(v.Filename, rawJSON, 0600)
 }
 
-func (v *Vocabulary) SaveToFile(filename string) error {
+func (v *Vocabulary) SaveFile(filename string) error {
 	v.Filename = filename
 	return v.Save()
 }
