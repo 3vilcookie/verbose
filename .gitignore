@@ -2,3 +2,4 @@ Config.php
 *.swp
 
 ci-build/
+coverage/
