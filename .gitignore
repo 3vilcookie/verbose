@@ -1,3 +1,4 @@
 Config.php
 *.swp
 
+ci-build/
