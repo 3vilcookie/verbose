@@ -11,7 +11,7 @@ func TestNew(t *testing.T) {
 	require.NotNil(t, New())
 }
 
-func TestFromFile(t *testing.T) {
+func TestLoadFile(t *testing.T) {
 	filename := "words.json"
 
 	tempFile, err := os.CreateTemp("", filename)
@@ -29,7 +29,7 @@ func TestFromFile(t *testing.T) {
 	}}`))
 	require.Nil(t, err)
 
-	v, err := FromFile(tempFile.Name())
+	v, err := LoadFile(tempFile.Name())
 	require.Nil(t, err)
 	require.NotNil(t, v)
 	require.Equal(t, tempFile.Name(), v.Filename)
@@ -46,13 +46,13 @@ func TestFromFile(t *testing.T) {
 	}, words)
 }
 
-func TestFromFileNotExistingFile(t *testing.T) {
-	_, err := FromFile("")
+func TestLoadFileNotExistingFile(t *testing.T) {
+	_, err := LoadFile("")
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, os.ErrNotExist)
 }
 
-func TestFromFileBadJSON(t *testing.T) {
+func TestLoadFileBadJSON(t *testing.T) {
 	tempFile, err := os.CreateTemp("", "bad.json")
 	require.Nil(t, err)
 	defer os.Remove(tempFile.Name())
@@ -60,7 +60,7 @@ func TestFromFileBadJSON(t *testing.T) {
 	_, err = tempFile.Write([]byte(`{`))
 	require.Nil(t, err)
 
-	_, err = FromFile(tempFile.Name())
+	_, err = LoadFile(tempFile.Name())
 	require.NotNil(t, err)
 	require.Error(t, err, "unexpected end of json input")
 }
@@ -79,7 +79,7 @@ func TestSave(t *testing.T) {
 		},
 	}
 
-	require.Nil(t, v.SaveToFile(tempFile.Name()))
+	require.Nil(t, v.SaveFile(tempFile.Name()))
 
 	content, err := os.ReadFile(tempFile.Name())
 	require.Nil(t, err)
