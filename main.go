@@ -91,7 +91,7 @@ func main() {
 			return
 		}
 
-		deList := strings.Split(rawDeList, ", ")
+		deList := strings.Split(rawDeList, ",")
 
 		if _, exists := voc.Entries[en]; exists {
 			c.String(http.StatusBadRequest, "duplicate, english word already existing")
