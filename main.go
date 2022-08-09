@@ -80,13 +80,13 @@ func main() {
 
 	authorized.POST("/new", func(c *gin.Context) {
 		en, ok := c.GetPostForm("en")
-		if !ok {
+		if !ok || en == "" {
 			c.String(http.StatusBadRequest, "parameter 'en' missing")
 			return
 		}
 
 		rawDeList, ok := c.GetPostForm("de")
-		if !ok {
+		if !ok || rawDeList == "" {
 			c.String(http.StatusBadRequest, "parameter 'de' missing")
 			return
 		}
