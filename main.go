@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/RaphaelPour/verbose/pkg/vocabulary"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,8 @@ var (
 	logoImage []byte
 
 	voc vocabulary.Vocabulary
+
+	mutex sync.Mutex
 
 	Filename = flag.String("vocabulary-file", "vocabulary.json", "Path to vocabulary file.")
 	Port     = flag.Int("port", 8080, "Serverport")
@@ -58,6 +61,8 @@ func main() {
 	router := gin.Default()
 	router.SetHTMLTemplate(renderer)
 	router.GET("/", func(c *gin.Context) {
+		mutex.Lock()
+		defer mutex.Unlock()
 		c.HTML(http.StatusOK, "index", voc.Entries)
 	})
 
@@ -85,16 +90,19 @@ func main() {
 			return
 		}
 
+		// redirect to index
+		// defer before lock in order to unlock prior
+		c.Request.URL.Path = "/"
+		c.Request.Method = "GET"
+		defer router.HandleContext(c)
+
+		mutex.Lock()
+		defer mutex.Unlock()
 		voc.Entries[en] = vocabulary.Translation{
 			Words: deList,
 		}
 
 		voc.Save()
-
-		// redirect to index
-		c.Request.URL.Path = "/"
-		c.Request.Method = "GET"
-		router.HandleContext(c)
 	})
 
 	if err := router.Run(fmt.Sprintf("localhost:%d", *Port)); err != nil {
