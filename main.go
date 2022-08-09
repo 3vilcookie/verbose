@@ -2,9 +2,11 @@ package main
 
 import (
 	_ "embed"
+	"flag"
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/RaphaelPour/verbose/pkg/vocabulary"
@@ -19,9 +21,13 @@ var (
 	logoImage []byte
 
 	voc vocabulary.Vocabulary
+
+	Filename = flag.String("vocabulary-file", "vocabulary.json", "Path to vocabulary file.")
 )
 
 func main() {
+	flag.Parse()
+
 	// add pipeline function 'join' to convert en-words to list
 	renderFunctions := template.FuncMap{
 		"join": strings.Join,
@@ -34,15 +40,18 @@ func main() {
 		return
 	}
 
-	// load vocabulary
-	voc := vocabulary.New()
-	voc.Entries["verbose"] = vocabulary.Translation{
-		Words: []string{
-			"wortreich",
-			"langatmig",
-			"ausführlich",
-			"weitschweifig",
-		},
+	var voc *vocabulary.Vocabulary
+	if _, err := os.Stat(*Filename); os.IsNotExist(err) {
+		// create new vocabulary if file not existing
+		voc = vocabulary.New()
+		voc.Filename = *Filename
+		voc.Save()
+	} else {
+		// load vocabulary
+		if voc, err = vocabulary.LoadFile(*Filename); err != nil {
+			fmt.Printf("error loading vocabulary from file '%s': %s\n", *Filename, err)
+			return
+		}
 	}
 
 	router := gin.Default()
@@ -78,6 +87,8 @@ func main() {
 		voc.Entries[en] = vocabulary.Translation{
 			Words: deList,
 		}
+
+		voc.Save()
 
 		// redirect to index
 		c.Request.URL.Path = "/"
