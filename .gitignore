@@ -1,5 +1,5 @@
-Config.php
 *.swp
 
 ci-build/
 coverage/
+credentials.json

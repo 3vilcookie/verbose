@@ -2,6 +2,8 @@ package main
 
 import (
 	_ "embed"
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"html/template"
@@ -25,14 +27,20 @@ var (
 
 	mutex sync.Mutex
 
-	Filename = flag.String("vocabulary-file", "vocabulary.json", "Path to vocabulary file.")
-	Port     = flag.Int("port", 8080, "Serverport")
-	User     = flag.String("user", "", "Basic Auth user")
-	Password = flag.String("password", "", "Basic Auth password")
+	Filename        = flag.String("vocabulary-file", "vocabulary.json", "Path to vocabulary file.")
+	Port            = flag.Int("port", 8080, "Serverport")
+	CredentialsFile = flag.String("credentials-file", "credentials.json", "Path to credentials file with user and pw.")
 )
 
 func main() {
 	flag.Parse()
+
+	// parse credentials file
+	accounts, err := loadAccounts(*CredentialsFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// add pipeline function 'join' to convert en-words to list
 	renderFunctions := template.FuncMap{
@@ -63,9 +71,7 @@ func main() {
 	router := gin.Default()
 
 	// initialize basic auth for /new routes
-	authorized := router.Group("/", gin.BasicAuth(gin.Accounts{
-		*User: *Password,
-	}))
+	authorized := router.Group("/", gin.BasicAuth(accounts))
 
 	router.SetHTMLTemplate(renderer)
 	router.GET("/", func(c *gin.Context) {
@@ -111,4 +117,22 @@ func main() {
 	if err := router.Run(fmt.Sprintf("localhost:%d", *Port)); err != nil {
 		fmt.Println(err)
 	}
+}
+
+func loadAccounts(filename string) (gin.Accounts, error) {
+	if filename == "" {
+		return nil, errors.New("cannot start without users file")
+	}
+
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("error reading %s: %w", filename, err)
+	}
+
+	users := make(gin.Accounts)
+	if err := json.Unmarshal(data, &users); err != nil {
+		return nil, fmt.Errorf("error parsing %s: %w", filename, err)
+	}
+
+	return users, nil
 }
