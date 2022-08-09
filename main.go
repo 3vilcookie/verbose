@@ -98,19 +98,14 @@ func main() {
 			return
 		}
 
-		// redirect to index
-		// defer before lock in order to unlock prior
-		c.Request.URL.Path = "/"
-		c.Request.Method = "GET"
-		defer router.HandleContext(c)
-
 		mutex.Lock()
 		defer mutex.Unlock()
 		voc.Entries[en] = vocabulary.Translation{
 			Words: deList,
 		}
-
 		voc.Save()
+
+		c.Redirect(http.StatusFound, "/")
 	})
 
 	if err := router.Run(fmt.Sprintf("localhost:%d", *Port)); err != nil {
