@@ -23,6 +23,7 @@ var (
 	voc vocabulary.Vocabulary
 
 	Filename = flag.String("vocabulary-file", "vocabulary.json", "Path to vocabulary file.")
+	Port     = flag.Int("port", 8080, "Serverport")
 )
 
 func main() {
@@ -96,7 +97,7 @@ func main() {
 		router.HandleContext(c)
 	})
 
-	if err := router.Run(); err != nil {
+	if err := router.Run(fmt.Sprintf("localhost:%d", *Port)); err != nil {
 		fmt.Println(err)
 	}
 }
