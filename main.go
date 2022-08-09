@@ -27,6 +27,8 @@ var (
 
 	Filename = flag.String("vocabulary-file", "vocabulary.json", "Path to vocabulary file.")
 	Port     = flag.Int("port", 8080, "Serverport")
+	User     = flag.String("user", "", "Basic Auth user")
+	Password = flag.String("password", "", "Basic Auth password")
 )
 
 func main() {
@@ -59,6 +61,12 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	// initialize basic auth for /new routes
+	authorized := router.Group("/", gin.BasicAuth(gin.Accounts{
+		*User: *Password,
+	}))
+
 	router.SetHTMLTemplate(renderer)
 	router.GET("/", func(c *gin.Context) {
 		mutex.Lock()
@@ -70,7 +78,7 @@ func main() {
 		c.Data(http.StatusOK, "image/png", logoImage)
 	})
 
-	router.POST("/", func(c *gin.Context) {
+	authorized.POST("/new", func(c *gin.Context) {
 		en, ok := c.GetPostForm("en")
 		if !ok {
 			c.String(http.StatusBadRequest, "parameter 'en' missing")
