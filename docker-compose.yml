@@ -5,16 +5,13 @@ services:
     container_name: verbose
     build: .
     restart: always
-    ports:
-        - 8080:8080
     labels:
       caddy: verbose.evilcookie.de
-      caddy.reverse_proxy: "{{upstreams http 8001}}"
+      caddy.reverse_proxy: "{{upstreams http 8011}}"
     volumes:
-        - data:/usr/lib/verbose/
+      - data:/usr/lib/verbose/
 
 networks:
   default:
     external:
       name: aproxymate_caddy
-
