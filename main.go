@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -45,6 +46,17 @@ func main() {
 	// add pipeline function 'join' to convert en-words to list
 	renderFunctions := template.FuncMap{
 		"join": strings.Join,
+		"random_word" : func(words map[string]vocabulary.Translation)(string){
+			random_index := rand.Intn(len(words)-1)
+			for en, translation := range words {
+				if random_index > 0{
+					random_index--
+					continue
+				}
+				return fmt.Sprintf("%s - %s", en, strings.Join(translation.Words, ","))
+			}
+			return ""
+		},
 	}
 
 	// set up custom renderer in order to use an embedded template
