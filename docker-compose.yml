@@ -1,13 +1,13 @@
 version: '3.7'
 
 services:
-  web:
+  service:
     container_name: verbose
     build: .
     restart: always
     labels:
-      caddy: verbose.evilcookie.de
-      caddy.reverse_proxy: "{{upstreams http 8011}}"
+      caddy: verbose.raphaelpour.de
+      caddy.reverse_proxy: "{{upstreams http 8000}}"
     volumes:
       - data:/usr/lib/verbose/
 
