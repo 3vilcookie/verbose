@@ -126,7 +126,7 @@ func main() {
 		c.Redirect(http.StatusFound, "/")
 	})
 
-	if err := router.Run(fmt.Sprintf("localhost:%d", *Port)); err != nil {
+	if err := router.Run(fmt.Sprintf(":%d", *Port)); err != nil {
 		fmt.Println(err)
 	}
 }
