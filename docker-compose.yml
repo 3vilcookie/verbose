@@ -9,7 +9,7 @@ services:
       caddy: verbose.raphaelpour.de
       caddy.reverse_proxy: "{{upstreams http 8000}}"
     volumes:
-      - data:/usr/lib/verbose/
+      - ./data:/usr/lib/verbose/
 
 volumes:
   data:
