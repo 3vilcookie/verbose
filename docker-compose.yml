@@ -11,6 +11,9 @@ services:
     volumes:
       - data:/usr/lib/verbose/
 
+volumes:
+  data:
+
 networks:
   default:
     external:
