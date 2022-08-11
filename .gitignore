@@ -3,3 +3,4 @@
 ci-build/
 coverage/
 credentials.json
+data/
