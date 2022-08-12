@@ -4,3 +4,4 @@ ci-build/
 coverage/
 credentials.json
 data/
+vocabulary.json
