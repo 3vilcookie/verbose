@@ -126,6 +126,30 @@ func main() {
 		c.Redirect(http.StatusFound, "/")
 	})
 
+	apiv1 := router.Group("api/v1")
+	apiv1.GET("/words", func(c *gin.Context) {
+		mutex.Lock()
+		defer mutex.Unlock()
+		c.JSON(http.StatusOK, voc.Entries)
+	})
+
+	apiv1.GET("/words/:word", func(c *gin.Context){
+		mutex.Lock()
+		defer mutex.Unlock()
+		translation, exists := voc.Entries[c.Param("word")]
+		if !exists {
+			c.JSON(
+				http.StatusNotFound,
+				map[string]string{
+					"error": "word not found",
+				},
+			)
+			return
+		}
+
+		c.JSON(http.StatusOK, translation)
+	})
+
 	if err := router.Run(fmt.Sprintf(":%d", *Port)); err != nil {
 		fmt.Println(err)
 	}
