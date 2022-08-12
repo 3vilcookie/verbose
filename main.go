@@ -33,6 +33,10 @@ var (
 	CredentialsFile = flag.String("credentials-file", "credentials.json", "Path to credentials file with user and pw.")
 )
 
+type PostTranslation struct{
+	Translation vocabulary.Translation `form:"translation" json:"translation" binding:"required"`
+}
+
 func main() {
 	flag.Parse()
 
@@ -127,6 +131,8 @@ func main() {
 	})
 
 	apiv1 := router.Group("api/v1")
+	authorizedAPIv1 := apiv1.Group("/", gin.BasicAuth(accounts))
+
 	apiv1.GET("/words", func(c *gin.Context) {
 		mutex.Lock()
 		defer mutex.Unlock()
@@ -148,6 +154,34 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, translation)
+	})
+
+	authorizedAPIv1.POST("/words/:word", func(c *gin.Context){
+		if _, exists := voc.Entries[c.Param("word")]; exists {
+			c.JSON(
+				http.StatusBadRequest,
+				map[string]string{
+					"error": "duplicate, english word already existing",
+				},
+			)
+			return
+		}
+		var data PostTranslation
+		if c.BindJSON(&data) != nil {
+			c.JSON(
+				http.StatusBadRequest,
+				map[string]string{
+					"error": "error parsing json",
+				},
+			)
+		}
+
+
+		mutex.Lock()
+		defer mutex.Unlock()
+		voc.Entries[c.Param("word")] = data.Translation
+		voc.Save()
+		c.JSON(http.StatusOK, map[interface{}]interface{}{})
 	})
 
 	if err := router.Run(fmt.Sprintf(":%d", *Port)); err != nil {
