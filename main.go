@@ -127,6 +127,20 @@ func main() {
 	})
 
 	apiv1 := router.Group("api/v1")
+	apiv1.Use(func(c *gin.Context) {
+		/* add cors header */
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH,OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.Status(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	})
 	authorizedAPIv1 := apiv1.Group("/", gin.BasicAuth(accounts))
 
 	apiv1.GET("/words", func(c *gin.Context) {
