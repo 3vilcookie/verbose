@@ -33,10 +33,6 @@ var (
 	CredentialsFile = flag.String("credentials-file", "credentials.json", "Path to credentials file with user and pw.")
 )
 
-type PostTranslation struct{
-	Translation vocabulary.Translation `form:"translation" json:"translation" binding:"required"`
-}
-
 func main() {
 	flag.Parse()
 
