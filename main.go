@@ -46,10 +46,10 @@ func main() {
 	// add pipeline function 'join' to convert en-words to list
 	renderFunctions := template.FuncMap{
 		"join": strings.Join,
-		"random_word" : func(words map[string]vocabulary.Translation)(string){
-			random_index := rand.Intn(len(words)-1)
+		"random_word": func(words map[string]vocabulary.Translation) string {
+			random_index := rand.Intn(len(words) - 1)
 			for en, translation := range words {
-				if random_index > 0{
+				if random_index > 0 {
 					random_index--
 					continue
 				}
@@ -135,7 +135,7 @@ func main() {
 		c.JSON(http.StatusOK, voc.Entries)
 	})
 
-	apiv1.GET("/words/:word", func(c *gin.Context){
+	apiv1.GET("/words/:word", func(c *gin.Context) {
 		mutex.Lock()
 		defer mutex.Unlock()
 		translation, exists := voc.Entries[c.Param("word")]
@@ -152,7 +152,7 @@ func main() {
 		c.JSON(http.StatusOK, translation)
 	})
 
-	authorizedAPIv1.POST("/words/:word", func(c *gin.Context){
+	authorizedAPIv1.POST("/words/:word", func(c *gin.Context) {
 		if _, exists := voc.Entries[c.Param("word")]; exists {
 			c.JSON(
 				http.StatusBadRequest,
