@@ -10,7 +10,7 @@ type Translation struct {
 }
 
 type Vocabulary struct {
-	Entries map[string]Translation `json:"words"`
+	Entries map[string]Translation
 
 	Filename string
 }
