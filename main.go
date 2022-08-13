@@ -166,7 +166,7 @@ func main() {
 			)
 			return
 		}
-		var data PostTranslation
+		var data vocabulary.Translation
 		if c.BindJSON(&data) != nil {
 			c.JSON(
 				http.StatusBadRequest,
@@ -176,10 +176,9 @@ func main() {
 			)
 		}
 
-
 		mutex.Lock()
 		defer mutex.Unlock()
-		voc.Entries[c.Param("word")] = data.Translation
+		voc.Entries[c.Param("word")] = data
 		voc.Save()
 		c.JSON(http.StatusOK, map[interface{}]interface{}{})
 	})
