@@ -190,7 +190,7 @@ func main() {
 		defer mutex.Unlock()
 		voc.Entries[c.Param("word")] = data
 		voc.Save()
-		c.JSON(http.StatusOK, map[interface{}]interface{}{})
+		c.JSON(http.StatusOK, gin.H{})
 	})
 
 	if err := router.Run(fmt.Sprintf(":%d", *Port)); err != nil {
