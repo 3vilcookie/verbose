@@ -47,7 +47,10 @@ func main() {
 	renderFunctions := template.FuncMap{
 		"join": strings.Join,
 		"random_word": func(words map[string]vocabulary.Translation) string {
-			random_index := rand.Intn(len(words) - 1)
+			if len(words) == 0 {
+				return "NULL - no words available"
+			}
+			random_index := rand.Intn(len(words))
 			for en, translation := range words {
 				if random_index > 0 {
 					random_index--
@@ -118,9 +121,21 @@ func main() {
 
 		mutex.Lock()
 		defer mutex.Unlock()
-		voc.Entries[en] = vocabulary.Translation{
+		entry := vocabulary.Translation{
 			Words: deList,
 		}
+		original, ok1 := c.GetPostForm("example_original")
+		translation, ok2 := c.GetPostForm("example_translation")
+		fmt.Println(original, ok1)
+		fmt.Println(translation, ok2)
+		if ok1 && ok2 {
+			entry.Example = vocabulary.Example{
+				Original:    original,
+				Translation: translation,
+			}
+		}
+
+		voc.Entries[en] = entry
 		voc.Save()
 
 		c.Redirect(http.StatusFound, "/")
