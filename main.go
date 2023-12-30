@@ -24,8 +24,6 @@ var (
 	//go:embed logo.png
 	logoImage []byte
 
-	voc vocabulary.Vocabulary
-
 	mutex sync.Mutex
 
 	Filename        = flag.String("vocabulary-file", "vocabulary.json", "Path to vocabulary file.")
@@ -74,7 +72,10 @@ func main() {
 		// create new vocabulary if file not existing
 		voc = vocabulary.New()
 		voc.Filename = *Filename
-		voc.Save()
+		if err := voc.Save(); err != nil {
+			fmt.Println(err)
+			return
+		}
 	} else {
 		// load vocabulary
 		if voc, err = vocabulary.LoadFile(*Filename); err != nil {
@@ -136,7 +137,10 @@ func main() {
 		}
 
 		voc.Entries[en] = entry
-		voc.Save()
+		if err := voc.Save(); err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("error saving new entry: %s", err))
+			return
+		}
 
 		c.Redirect(http.StatusFound, "/")
 	})
@@ -204,7 +208,10 @@ func main() {
 		mutex.Lock()
 		defer mutex.Unlock()
 		voc.Entries[c.Param("word")] = data
-		voc.Save()
+		if err := voc.Save(); err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("error saving new entry: %s", err))
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{})
 	})
 
