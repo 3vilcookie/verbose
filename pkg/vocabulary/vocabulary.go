@@ -6,13 +6,13 @@ import (
 )
 
 type Example struct {
-	Original    string `json:"original"`
-	Translation string `json:"translation"`
+	Original    string `json:"original,omitempty"`
+	Translation string `json:"translation,omitempty"`
 }
 
 type Translation struct {
 	Words   []string `json:"words"`
-	Example Example  `json:"example,omitempty"`
+	Example *Example `json:"example,omitempty"`
 }
 
 type Vocabulary struct {

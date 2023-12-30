@@ -129,7 +129,7 @@ func main() {
 		fmt.Println(original, ok1)
 		fmt.Println(translation, ok2)
 		if ok1 && ok2 {
-			entry.Example = vocabulary.Example{
+			entry.Example = &vocabulary.Example{
 				Original:    original,
 				Translation: translation,
 			}
