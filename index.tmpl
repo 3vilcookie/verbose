@@ -30,6 +30,12 @@
             <div class="col-lg-2">
                 <input class="form-control" id="name1" name="de" placeholder="quasseln" type="text"/>
             </div>
+            <div class="col-lg-3">
+                <input class="form-control" id="example_original" name="example_original" placeholder="He talks very verbose." type="text"/>
+            </div>
+            <div class="col-lg-3">
+                <input class="form-control" id="example_translation" name="example_translation" placeholder="Er redet sehr ausführlich." type="text"/>
+            </div>
             <div class="col-lg-2">
                     <button class="btn btn-success " name="submit" type="submit">Add</button>
             </div>
@@ -43,6 +49,7 @@
         <tr>
         <th>EN</th>
         <th>DE</th>
+        <th>Example</th>
         </tr>
     </thead>
     <tbody>
@@ -50,6 +57,13 @@
     <tr>
         <td>{{$en}}</td>
         <td>{{join $translation.Words ", "}}</td>
+        {{if $translation.Example}}
+        <td data-toggle="tooltip" data-placement="top" title="{{$translation.Example.Translation}}">
+            {{$translation.Example.Original}}
+        </td>
+        {{else}}
+        <td></td>
+        {{end}}
     </tr>
     {{ end }}
     </tbody>
