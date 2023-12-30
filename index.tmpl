@@ -57,13 +57,13 @@
     <tr>
         <td>{{$en}}</td>
         <td>{{join $translation.Words ", "}}</td>
-        {{if $translation.Example}}
-        <td data-toggle="tooltip" data-placement="top" title="{{$translation.Example.Translation}}">
-            {{$translation.Example.Original}}
-        </td>
-        {{else}}
-        <td></td>
+        <td>
+        {{if $translation.Example.Original}}
+            <details><summary>{{$translation.Example.Original}}</summary>
+                {{$translation.Example.Translation}}
+            </details>
         {{end}}
+        </td>
     </tr>
     {{ end }}
     </tbody>
