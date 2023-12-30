@@ -1,6 +1,8 @@
-# For next release
+# Major Release v1.0.0 (2023-12-30)
   * **Raphael Pour**
-    * rework service to go with file-based db
-    * add example sentence
+    * rework service:
+      * json file based db 
+      * golang instead of php
+    * add example sentence to translation
 
-*Not released yet*
+*Released by Raphael Pour <info@raphaelpour.de>*
