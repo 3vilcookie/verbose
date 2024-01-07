@@ -13,13 +13,18 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/RaphaelPour/verbose/pkg/vocabulary"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/render"
+
+	"github.com/RaphaelPour/verbose/pkg/vocabulary"
 )
 
 var (
 	//go:embed index.tmpl
 	indexTemplate string
+
+	//go:embed edit.tmpl
+	editTemplate string
 
 	//go:embed logo.png
 	logoImage []byte
@@ -31,18 +36,10 @@ var (
 	CredentialsFile = flag.String("credentials-file", "credentials.json", "Path to credentials file with user and pw.")
 )
 
-func main() {
-	flag.Parse()
+type TemplateStore map[string]*template.Template
 
-	// parse credentials file
-	accounts, err := loadAccounts(*CredentialsFile)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// add pipeline function 'join' to convert en-words to list
-	renderFunctions := template.FuncMap{
+func RenderFunctions() template.FuncMap {
+	return template.FuncMap{
 		"join": strings.Join,
 		"random_word": func(words map[string]vocabulary.Translation) string {
 			if len(words) == 0 {
@@ -60,10 +57,53 @@ func main() {
 		},
 	}
 
-	// set up custom renderer in order to use an embedded template
-	renderer, err := template.New("index").Funcs(renderFunctions).Parse(indexTemplate)
+}
+
+func NewTemplateStore() (TemplateStore, error) {
+
+	index, err := template.New("index").Funcs(RenderFunctions()).Parse(indexTemplate)
+	if err != nil {
+		return nil, err
+	}
+
+	edit, err := template.New("edit").Funcs(RenderFunctions()).Parse(editTemplate)
+	if err != nil {
+		return nil, err
+	}
+
+	return TemplateStore{
+		"index": index,
+		"edit":  edit,
+	}, nil
+}
+
+func (t TemplateStore) Instance(name string, data any) render.Render {
+	tmpl, ok := t[name]
+	if !ok {
+		fmt.Printf("error finding template %s", name)
+		return render.HTML{}
+	}
+
+	return render.HTML{
+		Template: tmpl,
+		Data:     data,
+	}
+}
+
+func main() {
+	flag.Parse()
+
+	// parse credentials file
+	accounts, err := loadAccounts(*CredentialsFile)
 	if err != nil {
 		fmt.Println(err)
+		return
+	}
+
+	// set up custom renderer in order to use an embedded template
+	renderer, err := NewTemplateStore()
+	if err != nil {
+		fmt.Printf("error creating template store: %s\n", err)
 		return
 	}
 
@@ -89,7 +129,7 @@ func main() {
 	// initialize basic auth for /new routes
 	authorized := router.Group("/", gin.BasicAuth(accounts))
 
-	router.SetHTMLTemplate(renderer)
+	router.HTMLRender = renderer
 	router.GET("/", func(c *gin.Context) {
 		mutex.Lock()
 		defer mutex.Unlock()
@@ -130,16 +170,81 @@ func main() {
 		fmt.Println(original, ok1)
 		fmt.Println(translation, ok2)
 		if ok1 && ok2 {
-			entry.Example = &vocabulary.Example{
-				Original:    original,
-				Translation: translation,
-			}
+			entry.ExampleOriginal = original
+			entry.ExampleTranslation = translation
 		}
 
 		voc.Entries[en] = entry
 		if err := voc.Save(); err != nil {
 			c.String(http.StatusInternalServerError, fmt.Sprintf("error saving new entry: %s", err))
 			return
+		}
+
+		c.Redirect(http.StatusFound, "/")
+	})
+
+	router.GET("/edit/:word", func(c *gin.Context) {
+		mutex.Lock()
+		defer mutex.Unlock()
+		translation, exists := voc.Entries[c.Param("word")]
+		if !exists {
+			c.String(
+				http.StatusNotFound,
+				"error: word not found",
+			)
+			return
+		}
+
+		data := struct {
+			En          string
+			Translation vocabulary.Translation
+		}{
+			c.Param("word"),
+			translation,
+		}
+
+		c.HTML(http.StatusOK, "edit", data)
+	})
+
+	// I'd like to use PUT here, but this is not allowed :(
+	// https://softwareengineering.stackexchange.com/a/211790
+	authorized.POST("/edit/:word", func(c *gin.Context) {
+		mutex.Lock()
+		defer mutex.Unlock()
+		translation, exists := voc.Entries[c.Param("word")]
+		if !exists {
+			c.JSON(
+				http.StatusNotFound,
+				map[string]string{
+					"error": "word not found",
+				},
+			)
+			return
+		}
+
+		// only change translation if it actually changed
+		changed := false
+		if list, ok := c.GetPostForm("translation"); ok && list != "" {
+			translation.Words = strings.Split(list, ",")
+			changed = true
+		}
+
+		if exampleOriginal, ok := c.GetPostForm("example_original"); ok && exampleOriginal != "" {
+			translation.ExampleOriginal = exampleOriginal
+			changed = true
+		}
+
+		if exampleTranslation, ok := c.GetPostForm("example_translation"); ok && exampleTranslation != "" {
+			translation.ExampleTranslation = exampleTranslation
+			changed = true
+		}
+
+		if changed {
+			voc.Entries[c.Param("word")] = translation
+			if err := voc.Save(); err != nil {
+				c.String(http.StatusInternalServerError, fmt.Sprintf("error saving new entry: %s", err))
+				return
+			}
 		}
 
 		c.Redirect(http.StatusFound, "/")

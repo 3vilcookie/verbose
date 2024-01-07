@@ -5,14 +5,10 @@ import (
 	"os"
 )
 
-type Example struct {
-	Original    string `json:"original,omitempty"`
-	Translation string `json:"translation,omitempty"`
-}
-
 type Translation struct {
-	Words   []string `json:"words"`
-	Example *Example `json:"example,omitempty"`
+	Words              []string `json:"words"`
+	ExampleOriginal    string   `json:"exampleOriginal,omitempty"`
+	ExampleTranslation string   `json:"exampleTranslation,omitempty"`
 }
 
 type Vocabulary struct {
