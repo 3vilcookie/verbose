@@ -1,3 +1,9 @@
+# For next release
+  * **Raphael Pour**
+    * index: make edit link a light button
+
+*Not released yet*
+
 # Minor Release v1.1.0 (2024-01-08)
   * **Raphael Pour**
     * add edit page per word
