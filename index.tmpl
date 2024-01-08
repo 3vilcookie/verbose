@@ -50,7 +50,7 @@
         <th>EN</th>
         <th>DE</th>
         <th>Example</th>
-        <th>Edit</eh>
+        <th></th>
         </tr>
     </thead>
     <tbody>
@@ -66,9 +66,8 @@
         {{end}}
         </td>
         <td>
-            <a href="edit/{{$en}}">
-            <span class="glyphicon gyphicon-pencil">Edit</span>
-            </a></td>
+            <button class="btn btn-light" onclick="window.location.href='edit/{{$en}}'">Edit</button>
+        </td>
     </tr>
     {{ end }}
     </tbody>
